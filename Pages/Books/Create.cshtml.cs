@@ -1,39 +1,48 @@
 ﻿using Marcu_Alexandru_Lab2.Models;
-using Marcu_Alexandru_Lab2.Data; // Add this using directive if Marcu_Alexandru_Lab2Context is defined in the Data namespace
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Mvc; // Add this using directive for BindProperty
-
-
+using Marcu_Alexandru_Lab2.Models;
+using Marcu_Alexandru_Lab2.Models;
 
 namespace Marcu_Alexandru_Lab2.Pages.Books
 {
-    public class CreateModel : PageModel
+    public class CreateModel : BookCatPageModel
     {
-        private readonly Marcu_Alexandru_Lab2Context _context;
-        public CreateModel(Marcu_Alexandru_Lab2Context context) => _context = context;
+        private readonly Marcu_Alexandru_Lab2.Data.Marcu_Alexandru_Lab2Context _context;
 
-        [BindProperty]
-        public Book Book { get; set; } = default!;
+        public CreateModel(Marcu_Alexandru_Lab2.Data.Marcu_Alexandru_Lab2Context context)
+        {
+            _context = context;
+        }
 
         public IActionResult OnGet()
         {
-            ViewData["PublisherID"] = new SelectList(_context.Publisher, "ID", "PublisherName", Book?.PublisherID);
-            ViewData["AuthorID"] = new SelectList(_context.Author, "ID", "LastName", Book?.AuthorID);
+            var authorList = _context.Author.Select(x => new { x.ID, FullName = x.LastName + " " + x.FirstName });
+            ViewData["AuthorID"] = new SelectList(authorList, "ID", "FullName");
+            ViewData["PublisherID"] = new SelectList(_context.Publisher, "ID", "PublisherName");
 
+            var book = new Book { BookCat = new List<BookCat>() };
+            PopulateAssignedCategoryData(_context, book);
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync()
+        [BindProperty]
+        public Book Book { get; set; }
+
+        public async Task<IActionResult> OnPostAsync(string[] selectedCategories)
         {
-            if (!ModelState.IsValid)
+            var newBook = new Book();
+
+            if (selectedCategories != null)
             {
-                ViewData["PublisherID"] = new SelectList(_context.Publisher, "ID", "PublisherName");
-                ViewData["AuthorID"] = new SelectList(_context.Author, "ID", "LastName");
-                return Page();
+                newBook.BookCat = new List<BookCat>();
+                foreach (var cat in selectedCategories)
+                {
+                    newBook.BookCat.Add(new BookCat { CategoryID = int.Parse(cat) });
+                }
             }
 
+            Book.BookCat = newBook.BookCat;
             _context.Book.Add(Book);
             await _context.SaveChangesAsync();
             return RedirectToPage("./Index");

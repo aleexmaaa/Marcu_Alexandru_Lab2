@@ -15,6 +15,7 @@ namespace Marcu_Alexandru_Lab2.Models
         public decimal Price { get; set; }
 
         [DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}", ApplyFormatInEditMode = true)]
         public DateTime PublishingDate { get; set; }
 
         public int? PublisherID { get; set; }
@@ -22,5 +23,6 @@ namespace Marcu_Alexandru_Lab2.Models
 
         public int? AuthorID { get; set; }
         public Author? Author { get; set; }
+        public ICollection<BookCat>? BookCat { get; set; }
     }
 }

@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Marcu_Alexandru_Lab2.Data;
 using Marcu_Alexandru_Lab2.Models;
 
-namespace Marcu_Alexandru_Lab2.Pages
+namespace Marcu_Alexandru_Lab2.Pages.Categories
 {
     public class IndexModel : PageModel
     {
@@ -19,13 +19,11 @@ namespace Marcu_Alexandru_Lab2.Pages
             _context = context;
         }
 
-        public IList<BookCat> BookCat { get;set; } = default!;
+        public IList<Category> Category { get;set; } = default!;
 
         public async Task OnGetAsync()
         {
-            BookCat = await _context.BookCat
-                .Include(b => b.Book)
-                .Include(b => b.Category).ToListAsync();
+            Category = await _context.Category.ToListAsync();
         }
     }
 }
