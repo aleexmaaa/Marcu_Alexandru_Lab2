@@ -30,13 +30,12 @@
                 <td>@item.Publisher?.PublisherName</td>
                 <td>@(item.Author != null ? $"{item.Author.FirstName} {item.Author.LastName}" : "")</td>
                 <td>
-                    @foreach (var bc in item.BookCat)
-                    {
-                        @bc.Category.CatName
-                
-                        <br />
-                    }
-                </td>
+                    @string.Join(", ",
+                    (item.BookCat ?? Enumerable.Empty<Marcu_Alexandru_Lab2.Models.BookCat>())
+                    .Select(bc => bc.Category?.CatName)
+                    .Where(name => !string.IsNullOrWhiteSpace(name))
+                                )
+            </td>
                 <td>
                     <a asp-page="./Edit" asp-route-id="@item.ID">Edit</a> |
                     <a asp-page="./Details" asp-route-id="@item.ID">Details</a> |
