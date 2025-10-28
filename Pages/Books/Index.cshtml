@@ -6,42 +6,67 @@
 }
 
 <h1>Index</h1>
-<p><a asp-page="Create">Create New</a></p>
+<a asp-page="Create">Create New</a>
+</p>
+
+<form asp-page="./Index" method="get">
+    <div class="form-actions no-color">
+        <p>
+            Find by Book Title / Author Name:
+            <input type="text" name="SearchString" value="@Model.CurrentFilter" />
+            <input type="submit" value="Search" class="btn btn-primary" /> |
+            <a asp-page="./Index">Back to full List</a>
+        </p>
+    </div>
+</form>
 
 <table class="table">
     <thead>
         <tr>
-            <th>@Html.DisplayNameFor(m => m.Book[0].Title)</th>
-            <th>@Html.DisplayNameFor(m => m.Book[0].Price)</th>
-            <th>@Html.DisplayNameFor(m => m.Book[0].PublishingDate)</th>
-            <th>Publisher</th>
-            <th>Author</th>
-            <th>Categories</th>
+            <th>
+                <a asp-page="./Index"
+                   asp-route-sortOrder="@Model.TitleSort"
+                   asp-route-currentFilter="@Model.CurrentFilter">
+                    @Html.DisplayNameFor(model => model.Book[0].Title)
+                </a>
+            </th>
+            <th>@Html.DisplayNameFor(model => model.Book[0].Price)</th>
+            <th>@Html.DisplayNameFor(model => model.Book[0].PublishingDate)</th>
+            <th>
+                <a asp-page="./Index"
+                   asp-route-sortOrder="@Model.AuthorSort"
+                   asp-route-currentFilter="@Model.CurrentFilter">
+                    @Html.DisplayNameFor(model => model.Book[0].Author)
+                </a>
+            </th>
+            <th>@Html.DisplayNameFor(model => model.Book[0].Publisher)</th>
+            <th>@Html.DisplayNameFor(model => model.Book[0].BookCat)</th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model.Book)
+        @foreach (var item in Model.BookD.Books)
         {
             <tr>
                 <td>@item.Title</td>
                 <td>@item.Price</td>
-                <td>@item.PublishingDate.ToString("dd/MM/yyyy")</td>
-                <td>@item.Publisher?.PublisherName</td>
-                <td>@(item.Author != null ? $"{item.Author.FirstName} {item.Author.LastName}" : "")</td>
+                <td>@item.PublishingDate.ToShortDateString()</td>
+
+                <td>@(item.Author?.FullName ?? "[No Author]")</td>
+                <td>@(item.Publisher?.PublisherName ?? "[No Publisher]")</td>
                 <td>
                     @string.Join(", ",
                     (item.BookCat ?? Enumerable.Empty<Marcu_Alexandru_Lab2.Models.BookCat>())
-                    .Select(bc => bc.Category?.CatName)
-                    .Where(name => !string.IsNullOrWhiteSpace(name))
-                                )
+                    .Where(bc => bc.Category != null)
+                    .Select(bc => bc.Category.CatName))
             </td>
-                <td>
-                    <a asp-page="./Edit" asp-route-id="@item.ID">Edit</a> |
-                    <a asp-page="./Details" asp-route-id="@item.ID">Details</a> |
-                    <a asp-page="./Delete" asp-route-id="@item.ID">Delete</a>
-                </td>
-            </tr>
-        }
+
+            <td>
+                <a asp-page="./Edit" asp-route-id="@item.ID">Edit</a> |
+                <a asp-page="./Details" asp-route-id="@item.ID">Details</a> |
+                <a asp-page="./Delete" asp-route-id="@item.ID">Delete</a>
+            </td>
+        </tr>
+                }
     </tbody>
 </table>
