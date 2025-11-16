@@ -1,12 +1,14 @@
-﻿using Marcu_Alexandru_Lab2.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using Marcu_Alexandru_Lab2.Data; // Add this using directive if Marcu_Alexandru_Lab2Context is defined in the Data namespace
+using Marcu_Alexandru_Lab2.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Marcu_Alexandru_Lab2.Data; // Add this using directive if Marcu_Alexandru_Lab2Context is defined in the Data namespace
+using Microsoft.EntityFrameworkCore;
 
 
 namespace Marcu_Alexandru_Lab2.Pages.Books
 {
+    [Authorize(Roles = "Admin")]
     public class DeleteModel : PageModel
     {
         private readonly Marcu_Alexandru_Lab2Context _context;

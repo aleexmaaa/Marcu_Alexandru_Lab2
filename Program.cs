@@ -1,25 +1,52 @@
 using Marcu_Alexandru_Lab2.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using System.Runtime.ConstrainedExecution;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddRazorPages();
-builder.Services.AddDbContext<Marcu_Alexandru_Lab2Context>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("Marcu_Alexandru_Lab2Context") ?? throw new InvalidOperationException("Connection string 'Marcu_Alexandru_Lab2Context' not found.")));
+// Admin policy
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminPolicy", policy =>
+        policy.RequireRole("Admin"));
+});
 
-builder.Services.AddDbContext<LibraryIdentityContext>(options =>options.UseSqlServer(builder.Configuration.GetConnectionString("Marcu_Alexandru_Lab2Context") ?? throw new InvalidOperationException("Connectionstring 'Marcu_Alexandru_Lab2Context' not found.")));
-builder.Services.AddDefaultIdentity<IdentityUser>(options =>options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<LibraryIdentityContext>();
+// Main DbContext
+builder.Services.AddDbContext<Marcu_Alexandru_Lab2Context>(options =>
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("Marcu_Alexandru_Lab2Context")
+        ?? throw new InvalidOperationException("Connection string 'Marcu_Alexandru_Lab2Context' not found.")));
+
+// Identity DbContext
+builder.Services.AddDbContext<LibraryIdentityContext>(options =>
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("Marcu_Alexandru_Lab2Context")
+        ?? throw new InvalidOperationException("Connection string 'Marcu_Alexandru_Lab2Context' not found.")));
+
+builder.Services.AddDefaultIdentity<IdentityUser>(options =>
+    options.SignIn.RequireConfirmedAccount = true)
+    .AddRoles<IdentityRole>()
+    .AddEntityFrameworkStores<LibraryIdentityContext>();
+
+// Razor Pages conventions
+builder.Services.AddRazorPages(options =>
+{
+    // Books - only authenticated users
+    options.Conventions.AuthorizeFolder("/Books");
+    options.Conventions.AllowAnonymousToPage("/Books/Index");
+    options.Conventions.AllowAnonymousToPage("/Books/Details");
+
+    // Admin only sections
+    options.Conventions.AuthorizeFolder("/Members", "AdminPolicy");
+    options.Conventions.AuthorizeFolder("/Publishers", "AdminPolicy");
+    options.Conventions.AuthorizeFolder("/Categories", "AdminPolicy");
+});
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
@@ -28,6 +55,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapRazorPages();

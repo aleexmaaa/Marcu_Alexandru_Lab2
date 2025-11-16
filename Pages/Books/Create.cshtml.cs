@@ -1,11 +1,13 @@
 ﻿using Marcu_Alexandru_Lab2.Models;
+using Marcu_Alexandru_Lab2.Models;
+using Marcu_Alexandru_Lab2.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Marcu_Alexandru_Lab2.Models;
-using Marcu_Alexandru_Lab2.Models;
 
 namespace Marcu_Alexandru_Lab2.Pages.Books
 {
+    [Authorize(Roles = "Admin")]
     public class CreateModel : BookCatPageModel
     {
         private readonly Marcu_Alexandru_Lab2.Data.Marcu_Alexandru_Lab2Context _context;
