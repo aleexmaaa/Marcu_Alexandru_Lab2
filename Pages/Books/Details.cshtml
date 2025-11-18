@@ -1,4 +1,4 @@
-﻿@page "{id:int}"
+﻿@page
 @model Marcu_Alexandru_Lab2.Pages.Books.DetailsModel
 
 <h1>Details</h1>
@@ -13,8 +13,9 @@
         <dt class="col-sm-2">Price</dt>
         <dd class="col-sm-10">@Model.Book.Price</dd>
 
-        <dt class="col-sm-2">Publishing Date</dt>
-        <dd class="col-sm-10">@Model.Book.PublishingDate</dd>
+        <dt class="col-sm-2">PublishingDate</dt>
+        <dd class="col-sm-10">@Model.Book.PublishingDate.ToString("dd/MM/yyyy")</dd>
+
 
         <dt class="col-sm-2">Publisher</dt>
         <dd class="col-sm-10">@Model.Book.Publisher?.PublisherName</dd>
@@ -23,9 +24,26 @@
         <dd class="col-sm-10">
             @(Model.Book.Author != null ? $"{Model.Book.Author.FirstName} {Model.Book.Author.LastName}" : "")
         </dd>
+
+        <dt class="col-sm-2">Categories</dt>
+        <dd class="col-sm-10">
+            @if (Model.Book.BookCat != null && Model.Book.BookCat.Any())
+            {
+                @foreach (var bc in Model.Book.BookCat)
+                {
+                    @bc.Category.CatName
+            
+                    <br />
+                }
+            }
+            else
+            {
+                <span>-</span>
+            }
+        </dd>
     </dl>
 </div>
 <div>
-    <a asp-page="Edit" asp-route-id="@Model.Book.ID">Edit</a> |
-    <a asp-page="Index">Back to List</a>
+    <a asp-page="./Edit" asp-route-id="@Model.Book.ID">Edit</a> |
+    <a asp-page="./Index">Back to List</a>
 </div>

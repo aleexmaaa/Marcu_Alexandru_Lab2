@@ -1,25 +1,44 @@
-﻿using Marcu_Alexandru_Lab2.Models;
-using Marcu_Alexandru_Lab2.Data; // Add this using directive if Marcu_Alexandru_Lab2Context is defined in the Data namespace
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Mvc; // Add this using directive for BindProperty
-
+using Marcu_Alexandru_Lab2.Models;
 
 namespace Marcu_Alexandru_Lab2.Pages.Books
 {
-    public class IndexModel(Marcu_Alexandru_Lab2Context context) : PageModel
+    public class IndexModel : PageModel
     {
-        private readonly Marcu_Alexandru_Lab2Context _context = context;
+        private readonly Marcu_Alexandru_Lab2.Data.Marcu_Alexandru_Lab2Context _context;
 
-        public IList<Book> Book { get; set; } = default!;
-
-        public async Task OnGetAsync()
+        public IndexModel(Marcu_Alexandru_Lab2.Data.Marcu_Alexandru_Lab2Context context)
         {
-            Book = await _context.Book
-                .Include(b => b.Publisher)
+            _context = context;
+        }
+
+        public IList<Book> Book { get; set; }
+        public BookData BookD { get; set; }
+        public int BookID { get; set; }
+        public int CategoryID { get; set; }
+
+        public async Task OnGetAsync(int? id, int? categoryID)
+        {
+            BookD = new BookData();
+
+            BookD.Books = await _context.Book
                 .Include(b => b.Author)
+                .Include(b => b.Publisher)
+                .Include(b => b.BookCat).ThenInclude(bc => bc.Category)
+                .AsNoTracking()
+                .OrderBy(b => b.Title)
                 .ToListAsync();
+
+            Book = BookD.Books.ToList();
+
+
+            if (id != null)
+            {
+                BookID = id.Value;
+                var book = BookD.Books.Where(i => i.ID == id.Value).Single();
+                BookD.Categories = book.BookCat.Select(s => s.Category);
+            }
         }
     }
 }

@@ -11,5 +11,7 @@ namespace Marcu_Alexandru_Lab2.Data
         public DbSet<Book> Book { get; set; } = default!;
         public DbSet<Publisher> Publisher { get; set; } = default!;
         public DbSet<Author> Author { get; set; } = default!;   
+        public DbSet<Marcu_Alexandru_Lab2.Models.BookCat> BookCat { get; set; } = default!;
+        public DbSet<Marcu_Alexandru_Lab2.Models.Category> Category { get; set; } = default!;
     }
 }
